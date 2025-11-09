@@ -1,0 +1,39 @@
+# Archivo: docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. SERVICIO DE BASE DE DATOS (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: gema_sas_db
+    restart: always
+    environment:
+      # Credenciales de acceso - Mejor práctica: definidas en Docker, no en el código.
+      MYSQL_ROOT_PASSWORD: root_password_segura
+      MYSQL_DATABASE: gema_sas
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_password
+    volumes:
+      # Esto ejecuta tu db_schema.sql automáticamente al levantar el contenedor
+      - ./backend-php/database/db_schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # 2. SERVICIO DE APLICACIÓN (PHP/Apache)
+  app:
+    build:
+      context: ./backend-php
+      dockerfile: Dockerfile
+    container_name: gema_sas_app
+    ports:
+      # El backend PHP estará accesible en http://localhost:8080
+      - "8080:80"
+    volumes:
+      # Mapea tu código PHP al servidor web
+      - ./backend-php:/var/www/html
+    environment:
+      # Estas variables se inyectan en el entorno para que config.php las lea
+      DB_HOST: db # Nombre del servicio de la DB para la red interna de Docker
+      DB_NAME: gema_sas
+      DB_USER: db_user
+      DB_PASSWORD: db_password
+    depends_on:
+      - db

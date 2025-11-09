@@ -1,0 +1,9 @@
+# gema-sas-app/.gitignore
+
+# Dependencias globales (si se instalaron en la raíz)
+/node_modules
+
+# Archivos de caché y de sistema
+.DS_Store
+*.log
+.vscode/
