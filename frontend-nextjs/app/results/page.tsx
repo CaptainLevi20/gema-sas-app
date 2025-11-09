@@ -18,6 +18,10 @@ import {
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Header from '../components/Header';
 
+// Define la URL base de la API, leída de .env.local
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+// Interfaces (Tipado) para la estructura de los datos
 interface Usuario {
     id: number;
     email: string;
@@ -33,6 +37,7 @@ interface DataResponse {
     espera: Usuario[];
 }
 
+// COMPONENTE MODULAR PARA CADA TABLA
 function UsuariosTable({ title, users }: { title: string; users: Usuario[] }) {
     return (
         <Paper
@@ -45,6 +50,7 @@ function UsuariosTable({ title, users }: { title: string; users: Usuario[] }) {
                 backgroundColor: 'white',
             }}
         >
+            {/* Muestra el título y el contador */}
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                 {title} ({users.length})
             </Typography>
@@ -64,15 +70,16 @@ function UsuariosTable({ title, users }: { title: string; users: Usuario[] }) {
                         users.map((u) => (
                             <TableRow key={u.id} hover>
                                 <TableCell>{u.email}</TableCell>
+                                {/* Muestra '-' si el campo es nulo */}
                                 <TableCell>{u.nombre || '-'}</TableCell>
                                 <TableCell>{u.apellido || '-'}</TableCell>
                                 <TableCell>{u.codigo}</TableCell>
-                                <TableCell>
-                                    {new Date(u.created_at).toLocaleString()}
-                                </TableCell>
+                                {/* Formato de fecha legible */}
+                                <TableCell>{new Date(u.created_at).toLocaleString()}</TableCell>
                             </TableRow>
                         ))
                     ) : (
+                        // Mensaje cuando no hay registros
                         <TableRow>
                             <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                                 <Typography variant="body2" color="text.secondary">
@@ -88,6 +95,7 @@ function UsuariosTable({ title, users }: { title: string; users: Usuario[] }) {
 }
 
 export default function ResultsPage() {
+    // Estado para almacenar los datos agrupados por la API
     const [data, setData] = useState<DataResponse>({
         activos: [],
         inactivos: [],
@@ -96,13 +104,16 @@ export default function ResultsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    //Hook para cargar el componente (Método GET)
     useEffect(() => {
         async function fetchData() {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL;
-            if (!API_URL) return setError('Configuración de API no encontrada.');
             try {
+                // Llamada al endpoint
                 const res = await fetch(`${API_URL}/list.php`);
+
                 if (!res.ok) throw new Error('Error al obtener los datos');
+
+                // Los datos vienen ya agrupados en tres arrays (activos, inactivos, espera)
                 const json = await res.json();
                 setData(json);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,7 +124,7 @@ export default function ResultsPage() {
             }
         }
         fetchData();
-    }, []);
+    }, []); // Dependencia vacía para ejecutar solo al montar
 
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
@@ -141,17 +152,19 @@ export default function ResultsPage() {
                     </Alert>
                 ) : (
                     <>
+                        {/* Resumen de contadores */}
                         <Box sx={{ mb: 6 }}>
                             <Typography variant="h4" fontWeight={700} sx={{ mb: 1 }}>
-                                📊 Usuarios Cargados
+                                📊 Gestión de Activos
                             </Typography>
                             <Typography color="text.secondary">
                                 Activos: {data?.activos?.length ?? 0} · Inactivos:{' '}
-                                {data?.inactivos?.length ?? 0} · En espera:{' '}
+                                {data?.inactivos?.length ?? 0} · En Espera:{' '}
                                 {data?.espera?.length ?? 0}
                             </Typography>
                         </Box>
 
+                        {/* Renderizado de las TRES tablas separadas */}
                         <UsuariosTable title="Usuarios Activos" users={data.activos} />
                         <UsuariosTable title="Usuarios Inactivos" users={data.inactivos} />
                         <UsuariosTable title="Usuarios en Espera" users={data.espera} />
