@@ -31,13 +31,14 @@ Este proyecto implementa la solución técnica para la **carga masiva de usuario
 Se requiere tener **Docker Compose** y **Node.js/npm** instalados.
 
 ### 1. Clonar el Repositorio
-
+Clona el repositorio en tu editor de texto, usando la terminal y pegando el siguiente comando
 ```bash
 git clone https://github.com/CaptainLevi20/gema-sas-app.git
 cd gema-sas-app
 ```
 
 ### 2. Configuración de Variables de Entorno
+Crea un archivo .env en la raíz del proyecto para definir las credenciales de la base de datos
 ```bash
 # .env
 DB_HOST=db
@@ -48,11 +49,13 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
 ### 3. Configuración del Backend (PHP y MySQL):
+En la terminal, levanta los servicios de Docker
 ```bash
 docker-compose up -d
 ```
 
 ### 4. Ejecución del Frontend (NextJs):
+En la terminal, instala las dependencias y ejecuta el servidor de desarrollo
 ```bash
 cd frontend-nextjs
 npm install
