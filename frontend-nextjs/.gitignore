@@ -1,0 +1,10 @@
+# Dependencias de Node.js
+/node_modules
+
+# Compilados y caché de Next.js
+/.next
+/out
+
+# Variables de entorno
+.env.local
+.env*.local
